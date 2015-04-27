@@ -8,10 +8,10 @@ Included classes
 ----------------
 
 
-### `JSONWebService`
+### [`JSONWebService`](blob/master/com/lorenzostanco/utils/JSONWebService.java)
 
-An `AsyncTask` wrapper to start requests to JSON web services and
-easily listen for events such as:
+An `AsyncTask` wrapper to start requests to JSON web services and easily listen on UI
+thread for events such as:
 
  * request started;
  * request cancelled;
@@ -22,7 +22,7 @@ easily listen for events such as:
 Inspired by the great [Mootools](http://mootools.net/) [`Request.JSON`](http://mootools.net/core/docs/1.5.1/Request/Request.JSON) class.
 
 
-### `BitmapLoader`
+### [`BitmapLoader`](blob/master/com/lorenzostanco/utils/BitmapLoader.java)
 
 Sync static functions that load `Bitmap` objects, optionally with automatic subsampling
 calculated from desired minimum width and height. Can also just return bitmap size.
@@ -47,5 +47,5 @@ I will gladly accept contributions also if they are just fixes or refinements.
 License
 -------
 
-Classes are licensed under the **[MIT License](http://choosealicense.com/licenses/mit)**. Just do what you want with this code.
+Classes are licensed under the **[MIT License](blob/master/LICENSE)**. Just do what you want with this code.
 
