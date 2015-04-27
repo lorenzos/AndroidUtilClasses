@@ -8,6 +8,19 @@ Included classes
 ----------------
 
 
+### [`BitmapLoader`](com/lorenzostanco/utils/BitmapLoader.java)
+
+Sync static functions that load `Bitmap` objects, optionally with automatic subsampling
+calculated from desired minimum width and height. Can also just return bitmap size.
+Supports various sources:
+
+ * file path as string
+ * resources
+ * assets
+
+This class is an implementation of this [official training guide](http://developer.android.com/training/displaying-bitmaps/load-bitmap.html).
+
+
 ### [`JSONWebService`](com/lorenzostanco/utils/JSONWebService.java)
 
 An `AsyncTask` wrapper to start requests to JSON web services and easily listen on UI
@@ -22,17 +35,11 @@ thread for events such as:
 Inspired by the great [Mootools](http://mootools.net/) [`Request.JSON`](http://mootools.net/core/docs/1.5.1/Request/Request.JSON) class.
 
 
-### [`BitmapLoader`](com/lorenzostanco/utils/BitmapLoader.java)
+### [`MailtoWebViewClient`](com/lorenzostanco/utils/MailtoWebViewClient.java)
 
-Sync static functions that load `Bitmap` objects, optionally with automatic subsampling
-calculated from desired minimum width and height. Can also just return bitmap size.
-Supports various sources:
+Attach this web client to a web view to make *mailto:* links work:
 
- * file path as string
- * resources
- * assets
-
-This class is an implementation of this [official training guide](http://developer.android.com/training/displaying-bitmaps/load-bitmap.html).
+	myWebView.setWebViewClient(new MailtoWebViewClient());
 
 
 Contribute
