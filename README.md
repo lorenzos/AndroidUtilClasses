@@ -42,6 +42,15 @@ Attach this web client to a web view to make *mailto:* links work:
 	myWebView.setWebViewClient(new MailtoWebViewClient());
 
 
+### [`LockableViewPager`](com/lorenzostanco/utils/LockableViewPager.java)
+
+Extends `ViewPager` to let you disable paging/swiping:
+
+	myLockableViewPager.setPagingEnabled(false);
+
+All credits for this class goes to [Santiago L. Valdarrama](https://blog.svpino.com/2011/08/29/disabling-pagingswiping-on-android).
+
+
 Contribute
 ----------
 
