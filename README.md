@@ -51,6 +51,15 @@ Extends `ViewPager` to let you disable paging/swiping:
 All credits for this class goes to [Santiago L. Valdarrama](https://blog.svpino.com/2011/08/29/disabling-pagingswiping-on-android).
 
 
+### [`ProgressOverlay`](com/lorenzostanco/utils/ProgressOverlay.java)
+
+Simulates a progress overlay creating a `ProgressDialog` with no borders, frame nor text:
+
+	overlay = ProgressOverlay.show(this);
+	/* ... */
+	overlay.dismiss();
+
+
 Contribute
 ----------
 
