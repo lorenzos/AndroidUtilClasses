@@ -6,7 +6,8 @@ import android.content.DialogInterface;
 import android.widget.ProgressBar;
 
 /**
- * Simulates a progress overlay with a progress dialog with no borders, frame nor text.
+ * Simulates a progress overlay with a progress dialog with no borders, frame nor text:
+ * {@code overlay = ProgressOverlay.show(this); ... overlay.dismiss()}
  */
 public class ProgressOverlay {
 	
