@@ -21,20 +21,6 @@ Supports various sources:
 This class is an implementation of this [official training guide](http://developer.android.com/training/displaying-bitmaps/load-bitmap.html).
 
 
-### [`JSONWebService`](com/lorenzostanco/utils/JSONWebService.java)
-
-An `AsyncTask` wrapper to start requests to JSON web services and easily listen on UI
-thread for events such as:
-
- * request started
- * request cancelled
- * request completed
- * success (JSON object received and correctly parsed)
- * error (IO problems, invalid JSON or `{ error: true }` in the received JSON object)
-
-Inspired by the great [Mootools](http://mootools.net/) [`Request.JSON`](http://mootools.net/core/docs/1.5.1/Request/Request.JSON) class.
-
-
 ### [`MailtoWebViewClient`](com/lorenzostanco/utils/MailtoWebViewClient.java)
 
 Attach this web client to a web view to make *mailto:* links work:
@@ -58,6 +44,24 @@ Simulates a progress overlay creating a `ProgressDialog` with no borders, frame 
 	overlay = ProgressOverlay.show(this);
 	/* ... */
 	overlay.dismiss();
+
+
+### [`Request`](com/lorenzostanco/utils/Request.java)
+
+A generic, abstract, web service client that uses `HttpURLConnection` inside an `AsyncTask`. It starts requests, read responses and manages event listeners. Two concrete implementations are provided as nested classes: `Request.JSON` and `Request.XML`: both extend the base client, implementing response parsing and error checking.
+
+	url = Uri.parse("http://www.example.com/ws/").buildUpon();
+	url.appendQueryParameter("foo", "bar");
+
+	ws = new Request.JSON();
+	ws.addEventListener(new Request.EventListener<JSONObject>() {
+		public void onSuccess(String url, JSONObject response) { 
+			Log.i("WS", "Received: " + response.toString());
+		}
+	});
+	ws.send(url.build().toString());
+
+Inspired by the great [Mootools](http://mootools.net/) [`Request`](http://mootools.net/core/docs/1.5.1/Request/Request) class.
 
 
 Contribute
