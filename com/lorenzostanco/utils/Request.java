@@ -100,6 +100,13 @@ public abstract class Request<T> {
 		return this;
 	}
 
+	/** Sets the request body from any object (using <code>.toString()</code>), a POST request will be then used
+	 * @return This object, for chaining */
+	public Request<T> setRequestBody(Object body) {
+		this.setRequestBody(body.toString());
+		return this;
+	}
+	
 	/** Clears the request headers
 	 * @return This object, for chaining */
 	public Request<T> clearRequestHeaders() {
