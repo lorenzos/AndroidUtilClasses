@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
  * Simulates a progress overlay with a progress dialog with no borders, frame nor text:
  * {@code overlay = ProgressOverlay.show(this); ... overlay.dismiss()}
  */
-public class ProgressOverlay {
+@SuppressWarnings("unused") public class ProgressOverlay {
 	
 	/** The color of the circular spinner on API 21+ (null to use the default one) */
 	public static Integer MATERIAL_COLOR = Color.WHITE;

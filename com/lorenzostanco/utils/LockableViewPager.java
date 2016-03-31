@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 
 /** Un ViewPager orizzontale, la cui paginazione col tocco può essere all'occorrenza bloccata 
  * http://stackoverflow.com/a/7814054/995958 */
-public class LockableViewPager extends ViewPager {
+@SuppressWarnings("unused") public class LockableViewPager extends ViewPager {
 	
 	private boolean isPagingEnabled = true;
 	

@@ -11,7 +11,7 @@ import android.webkit.WebViewClient;
  * Attach this web client to a WebView to make "mailto:" links work:
  * {@code myWebView.setWebViewClient(new MailtoWebViewClient());}
  */
-public class MailtoWebViewClient extends WebViewClient {
+@SuppressWarnings("unused") public class MailtoWebViewClient extends WebViewClient {
 	
 	@Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		if (url.startsWith("mailto:")) {

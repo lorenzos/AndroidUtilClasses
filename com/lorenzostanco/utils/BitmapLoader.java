@@ -12,7 +12,7 @@ import android.util.Log;
 /**
  * Carica in memoria immagini da file e risorse nel modo più efficiente possibile.
  */
-public class BitmapLoader {
+@SuppressWarnings("unused") public class BitmapLoader {
 
 	public final static boolean LOG = true;
 	public final static String TAG = "BITMAP-LOADER";
@@ -64,7 +64,7 @@ public class BitmapLoader {
 	/** 
 	 * Carica un'immagine dagli assets. Se le dimensioni del contenitore non sono date,
 	 * l'immagine verà caricata alla massima dimensione possibile (senza subsample).
-	 * @param String path Path all'interno degli assets
+	 * @param path Path all'interno degli assets
 	 * @param destW Larghezza del contenitore dell'immagine, 0 se non si conosce
 	 * @param destH Altezza del contenitore dell'immagine, 0 se non si conosce
 	 */

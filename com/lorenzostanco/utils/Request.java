@@ -43,7 +43,7 @@ import android.os.AsyncTask;
  * ws.send(url.build().toString());
  * </pre>
  */
-public abstract class Request<T> {
+@SuppressWarnings("unused") public abstract class Request<T> {
 
 	public final static int READ_BUFFER_SIZE = 4 * 1024;
 	public final static int DEFAULT_TIMEOUT = 60000;
@@ -66,8 +66,8 @@ public abstract class Request<T> {
 
 	/** Initializes the client */
 	public Request() {
-		this.eventListeners = new ArrayList<IEventListener<T>>();
-		this.requestHeaders = new HashMap<String, String>();
+		this.eventListeners = new ArrayList<>();
+		this.requestHeaders = new HashMap<>();
 	}
 	
 	/** Adds an event listener
@@ -133,7 +133,7 @@ public abstract class Request<T> {
 			// Before running request, fire onRequest event
 			protected void onPreExecute() {
 				for (IEventListener<T> l : eventListeners) l.onRequest(url);
-			};
+			}
 
 			// Background task
 			@Override protected Object doInBackground(Void... params) {
@@ -164,7 +164,7 @@ public abstract class Request<T> {
 					postExecute(url, result);
 				}
 				
-			};
+			}
 			
 		};
 		
@@ -249,9 +249,9 @@ public abstract class Request<T> {
 		// Read input stream
 		InputStream in = connection.getInputStream();
 		InputStreamReader inr = new InputStreamReader(in, "UTF-8");
-		int read = 0;
+		@SuppressWarnings("UnusedAssignment") int read = 0;
 		char[] buffer = new char[READ_BUFFER_SIZE];
-		StringBuffer stringBuffer = new StringBuffer();
+		@SuppressWarnings("StringBufferMayBeStringBuilder") StringBuffer stringBuffer = new StringBuffer();
 		while ((read = inr.read(buffer)) > 0) stringBuffer.append(buffer, 0, read);
 
 		// On success, result is the response string
@@ -264,19 +264,19 @@ public abstract class Request<T> {
 	public interface IEventListener<T> {
 		
 		/** Before web request is sent */
-		public void onRequest(String url);
+		void onRequest(String url);
 		
 		/** When web request is canceled */
-		public void onCancel(String url);
+		void onCancel(String url);
 		
 		/** After web request completed, with or without errors */
-		public void onComplete(String url);
+		void onComplete(String url);
 		
 		/** After web request completed successfully and the "error" condition is FALSE or not set */
-		public void onSuccess(String url, T response);
+		void onSuccess(String url, T response);
 		
 		/** After web request completed with errors, on connection errors or if the "error" condition is set and TRUE */
-		public void onError(String url, String code, String message);
+		void onError(String url, String code, String message);
 		
 	}
 
@@ -307,7 +307,7 @@ public abstract class Request<T> {
 			final String response = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
 			
 			// On success, result is the JSON
-			return new JSONObject(response.toString());
+			return new JSONObject(response);
 			
 		}
 
