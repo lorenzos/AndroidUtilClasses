@@ -1,5 +1,14 @@
 package com.lorenzostanco.utils;
 
+import android.os.AsyncTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,15 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-
-import android.os.AsyncTask;
 
 /**
  * Generic, abstract, web service client.
@@ -173,6 +173,9 @@ import android.os.AsyncTask;
 		
 	}
 
+	/** Returns the raw response as string, or NULL if send() didn't completed successfully */
+	public abstract String getRawResponse();
+
 	/** Cancel current connection, if any */
 	public void cancel() {
 		if (this.asyncTask != null) this.asyncTask.cancel(true);
@@ -286,7 +289,7 @@ import android.os.AsyncTask;
 		@Override public void onCancel(String url) { }
 		@Override public void onComplete(String url) { }
 		@Override public void onSuccess(String url, T response) { }
-		@Override public void onError(String url, String code, String message) { } 
+		@Override public void onError(String url, String code, String message) { }
 	}
 
 	/** 
@@ -294,6 +297,8 @@ import android.os.AsyncTask;
 	 * @see Request
 	 */
 	public static class JSON extends Request<JSONObject> {
+
+		private String rawResponse = null;
 
 		/** Initializes the client */
 		public JSON() {
@@ -304,10 +309,10 @@ import android.os.AsyncTask;
 			
 			// Open connection and get string
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			final String response = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
 			
 			// On success, result is the JSON
-			return new JSONObject(response);
+			return new JSONObject(rawResponse);
 			
 		}
 
@@ -328,6 +333,10 @@ import android.os.AsyncTask;
 				for (IEventListener<JSONObject> l : eventListeners) l.onSuccess(url, response);
 			}
 			
+		}
+
+		@Override public String getRawResponse() {
+			return rawResponse;
 		}
 		
 		/** Read an URL to get a JSON object in a sync way.
@@ -373,6 +382,8 @@ import android.os.AsyncTask;
 	 */
 	public static class XML extends Request<Document> {
 
+		private String rawResponse = null;
+
 		/** Initializes the client */
 		public XML() {
 			super();
@@ -382,10 +393,10 @@ import android.os.AsyncTask;
 			
 			// Open connection and get string
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			final String response = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
 			
 			// On success, result is the XML document
-			final StringReader responseReader = new StringReader(response);
+			final StringReader responseReader = new StringReader(rawResponse);
 			final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(responseReader));
 			responseReader.close();
 			return document;
@@ -410,6 +421,10 @@ import android.os.AsyncTask;
 				for (IEventListener<Document> l : eventListeners) l.onSuccess(url, response);
 			}
 			
+		}
+
+		@Override public String getRawResponse() {
+			return rawResponse;
 		}
 
 		/** Read an URL to get a XML document in a sync way.
