@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 /** Un ViewPager orizzontale, la cui paginazione col tocco può essere all'occorrenza bloccata 
@@ -26,6 +27,10 @@ import android.view.MotionEvent;
 	
 	@Override public boolean onInterceptTouchEvent(MotionEvent event) {
 		return this.isPagingEnabled && super.onInterceptTouchEvent(event);
+	}
+
+	@Override public boolean executeKeyEvent(final KeyEvent event) {
+		return false;
 	}
 	
 	public void setPagingEnabled(boolean b) {
