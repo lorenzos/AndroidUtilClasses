@@ -450,4 +450,41 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 	}
 	
+	/**
+	 * Concrete implementation for a web service which simply outputs the respose as String  
+	 * @see Request
+	 */
+	public static class PlainText extends Request<String> {
+
+		private String rawResponse = null;
+
+		/** Initializes the client */
+		public PlainText() {
+			super();
+		}
+
+		@Override protected Object requestInBackground(final String url) throws Exception {
+
+			// Open connection and get string
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+
+			// On success, result is the response as String
+			return rawResponse;
+
+		}
+
+		@Override protected void postExecute(final String url, Object result) {
+
+			// Always success if here, there's nothing to check in the plain text response
+			for (IEventListener<String> l : eventListeners) l.onSuccess(url, (String)result);
+
+		}
+
+		@Override public String getRawResponse() {
+			return rawResponse;
+		}
+
+	}
+	
 }
