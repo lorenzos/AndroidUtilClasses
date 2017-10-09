@@ -248,7 +248,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			connection.setDoOutput(false);
 			connection.setRequestMethod("GET");
 		}
-
+		
+		// Get the response code and throw an IOException with the response message if >= 400
+		final int status = connection.getResponseCode();
+		if (status >= 400) throw new IOException((status + " " + connection.getResponseMessage()).trim());
+		
 		// Read input stream
 		InputStream in = connection.getInputStream();
 		InputStreamReader inr = new InputStreamReader(in, "UTF-8");
