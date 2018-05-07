@@ -1,5 +1,6 @@
 package com.lorenzostanco.utils;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -55,8 +56,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	protected HttpURLConnection connection = null;
 	private AsyncTask<Void, Void, Object> asyncTask;
 	
-	// Optional request body, if not NULL a POST request will be used
-	protected String requestBody = null;
+	// Optional request method and body
+	protected String requestMethod = "GET";
+	protected Object requestBody = null;
 	
 	// Optional request headers
 	protected Map<String, String> requestHeaders;
@@ -72,7 +74,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	
 	/** Adds an event listener
 	 * @return This object, for chaining */
-	public Request<T> addEventListener(IEventListener<T> l) {
+	public Request<T> addEventListener(final IEventListener<T> l) {
 		this.eventListeners.add(l);
 		return this;
 	}
@@ -80,30 +82,41 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	/** Sets request timeout
 	 * @param timeout Timeout in milliseconds
 	 * @return This object, for chaining */
-	public Request<T> setTimeout(int timeout) {
+	public Request<T> setTimeout(final int timeout) {
 		this.timeout = timeout;
 		return this;
 	}
 
 	/** Sets the request headers
 	 * @return This object, for chaining */
-	public Request<T> setRequestHeaders(Map<String, String> headers) {
+	public Request<T> setRequestHeaders(final Map<String, String> headers) {
 		this.requestHeaders.clear();
 		this.requestHeaders.putAll(headers);
 		return this;
 	}
 
-	/** Sets the request body, a POST request will be then used
+	/** Sets the request method, default is GET
 	 * @return This object, for chaining */
-	public Request<T> setRequestBody(String body) {
-		this.requestBody = body;
+	@SuppressWarnings("UnusedReturnValue") 
+	public Request<T> setRequestMethod(final String method) {
+		this.requestMethod = method;
 		return this;
 	}
 
-	/** Sets the request body from any object (using <code>.toString()</code>), a POST request will be then used
+	/** Sets the request body from any object, using <code>.toString()</code>)
 	 * @return This object, for chaining */
-	public Request<T> setRequestBody(Object body) {
-		this.setRequestBody(body.toString());
+	@SuppressWarnings("UnusedReturnValue")
+	public Request<T> setRequestBody(final Object body) {
+		this.requestBody = body;
+		if (this.requestMethod.toUpperCase().equals("GET")) setRequestMethod("POST"); // Force POST if it was GET (retrocompatibility)
+		return this;
+	}
+
+	/** Sets the request method and the request body from any object
+	 * @return This object, for chaining */
+	public Request<T> setRequestMethodAndBody(final String method, final Object body) {
+		setRequestMethod(method);
+		setRequestBody(body);
 		return this;
 	}
 	
@@ -122,6 +135,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	}
 
 	/** Performs request on URL. Used by other public request() methods */
+	@SuppressLint("StaticFieldLeak") 
 	public void send(final String url) {
 		
 		// Cancel any running request
@@ -132,11 +146,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			
 			// Before running request, fire onRequest event
 			protected void onPreExecute() {
-				for (IEventListener<T> l : eventListeners) l.onRequest(url);
+				for (final IEventListener<T> l : eventListeners) l.onRequest(url);
 			}
 
 			// Background task
-			@Override protected Object doInBackground(Void... params) {
+			@Override protected Object doInBackground(final Void... params) {
 				try {
 					final Object response = requestInBackground(url);
 					disconnect();
@@ -148,17 +162,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			}
 			
 			// After running background task...
-			protected void onPostExecute(Object result) {
+			protected void onPostExecute(final Object result) {
 				if (this.isCancelled()) return;
 				
 				// Request is complete, errors or not!
-				for (IEventListener<T> l : eventListeners) l.onComplete(url);
+				for (final IEventListener<T> l : eventListeners) l.onComplete(url);
 				
 				// Exception?
 				if (result instanceof Exception) {
-					Exception e = (Exception)result;
+					final Exception e = (Exception)result;
 					final String errorCode = result instanceof SocketException || result instanceof UnknownHostException || result instanceof SocketTimeoutException ? "connection_error" : "unknown_error";
-					for (IEventListener<T> l : eventListeners) l.onError(url, errorCode, e.getClass().getSimpleName() + ": " + e.getMessage());
+					for (final IEventListener<T> l : eventListeners) l.onError(url, errorCode, e.getClass().getSimpleName() + ": " + e.getMessage());
 					
 				} else {
 					postExecute(url, result);
@@ -180,9 +194,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	public void cancel() {
 		if (this.asyncTask != null) this.asyncTask.cancel(true);
 		if (this.isRunning()) {
-			String url = this.connection.getURL().toString();
+			final String url = this.connection.getURL().toString();
 			disconnect();
-			for (IEventListener<T> l : this.eventListeners) l.onCancel(url);
+			for (final IEventListener<T> l : this.eventListeners) l.onCancel(url);
 		}
 	}
 
@@ -211,8 +225,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	 * This method is not used by class itself, it's intended to be an utility method
 	 * @param requestHeaders The request headers
 	 * @param requestBody The request body, if not null a POST request will be then used */
-	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestBody) throws IOException {
-		return requestStringSync(url, requestHeaders, requestBody, DEFAULT_TIMEOUT);
+	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final Object requestBody) throws IOException {
+		return requestStringSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 	}
 	
 	/** Read an URL to get a String in a sync way.
@@ -220,33 +234,35 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	 * @param requestHeaders The request headers
 	 * @param requestBody The request body, if not null a POST request will be then used
 	 * @param timeout Timeout in milliseconds */
-	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestBody, final int timeout) throws IOException {
+	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final Object requestBody, final int timeout) throws IOException {
 		final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection(); // Open connection
-		return requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+		return requestStringSyncFromConnection(connection, requestHeaders, requestMethod, requestBody, timeout);
 	}
 
 	/** Read an URL to get a String in a sync way, needs an already opened connection. */
-	private static String requestStringSyncFromConnection(final HttpURLConnection connection, final Map<String, String> requestHeaders, final String requestBody, final int timeout) throws IOException {
+	private static String requestStringSyncFromConnection(final HttpURLConnection connection, final Map<String, String> requestHeaders, final String requestMethod, final Object requestBody, final int timeout) throws IOException {
 	
 		// Setup connection
 		connection.setConnectTimeout(timeout);
 		connection.setReadTimeout(timeout);
-		if (requestHeaders != null) for (String header : requestHeaders.keySet()) {
+		if (requestHeaders != null) for (final String header : requestHeaders.keySet()) {
 			connection.setRequestProperty(header, requestHeaders.get(header));
 		}
+		
+		// Request method
+		connection.setRequestMethod(requestMethod.toUpperCase());
 		
 		// Optional request body
 		if (requestBody != null) {
 			connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-			out.write(requestBody);
+			final boolean requestBodyIsJSON = requestBody instanceof JSONObject || requestBody instanceof JSONArray;
+			connection.setRequestProperty("Content-Type", requestBodyIsJSON ? "application/json" : "application/x-www-form-urlencoded");
+			final OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+			out.write(requestBody.toString());
 			out.flush();
 			out.close();
 		} else {
 			connection.setDoOutput(false);
-			connection.setRequestMethod("GET");
 		}
 		
 		// Get the response code and throw an IOException with the response message if >= 400
@@ -254,11 +270,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		if (status >= 400) throw new IOException((status + " " + connection.getResponseMessage()).trim());
 		
 		// Read input stream
-		InputStream in = connection.getInputStream();
-		InputStreamReader inr = new InputStreamReader(in, "UTF-8");
+		final InputStream in = connection.getInputStream();
+		final InputStreamReader inr = new InputStreamReader(in, "UTF-8");
 		@SuppressWarnings("UnusedAssignment") int read = 0;
-		char[] buffer = new char[READ_BUFFER_SIZE];
-		@SuppressWarnings("StringBufferMayBeStringBuilder") StringBuffer stringBuffer = new StringBuffer();
+		final char[] buffer = new char[READ_BUFFER_SIZE];
+		@SuppressWarnings("StringBufferMayBeStringBuilder") final StringBuffer stringBuffer = new StringBuffer();
 		while ((read = inr.read(buffer)) > 0) stringBuffer.append(buffer, 0, read);
 
 		// On success, result is the response string
@@ -288,15 +304,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 	}
 
 	/** Simple implementation for a web service events listener, every method do nothing */
-	public static class EventListener<T> implements IEventListener<T> { 
-		@Override public void onRequest(String url) { }
-		@Override public void onCancel(String url) { }
-		@Override public void onComplete(String url) { }
-		@Override public void onSuccess(String url, T response) { }
-		@Override public void onError(String url, String code, String message) { }
+	public static class EventListener<T> implements IEventListener<T> {
+		@Override public void onRequest(final String url) { }
+		@Override public void onCancel(final String url) { }
+		@Override public void onComplete(final String url) { }
+		@Override public void onSuccess(final String url, final T response) { }
+		@Override public void onError(final String url, final String code, final String message) { }
 	}
 
-	/** 
+	/**
 	 * Concrete implementation for a web service which outputs a JSON object 
 	 * @see Request
 	 */
@@ -313,28 +329,28 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			
 			// Open connection and get string
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestMethod, requestBody, timeout);
 			
 			// On success, result is the JSON
 			return new JSONObject(rawResponse);
 			
 		}
 
-		@Override protected void postExecute(final String url, Object result) {
+		@Override protected void postExecute(final String url, final Object result) {
 			
 			// Cast JSON response
-			JSONObject response = (JSONObject)result;
+			final JSONObject response = (JSONObject)result;
 			
 			// Is error?
 			if (response.optBoolean("error", false)) {
-				for (IEventListener<JSONObject> l : eventListeners) l.onError(url, 
-					response.optString("error_code", "unknown_error"), 
+				for (final IEventListener<JSONObject> l : eventListeners) l.onError(url,
+					response.optString("error_code", "unknown_error"),
 					response.optString("error_message", "(unknown error)")
 				);
 				
 			// Success?
 			} else {
-				for (IEventListener<JSONObject> l : eventListeners) l.onSuccess(url, response);
+				for (final IEventListener<JSONObject> l : eventListeners) l.onSuccess(url, response);
 			}
 			
 		}
@@ -347,8 +363,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		 * This method is not used by class itself, it's intended to be an utility method
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used */
-		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestBody) throws IOException, JSONException {
-			return requestJSONObjectSync(url, requestHeaders, requestBody, DEFAULT_TIMEOUT);
+		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws IOException, JSONException {
+			return requestJSONObjectSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a JSON object in a sync way.
@@ -356,16 +372,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used
 		 * @param timeout Timeout in milliseconds */
-		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestBody, int timeout) throws IOException, JSONException {
-			return new JSONObject(requestStringSync(url, requestHeaders, requestBody, timeout));
+		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws IOException, JSONException {
+			return new JSONObject(requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout));
 		}
 
 		/** Read an URL to get a JSON array in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used */
-		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestBody) throws IOException, JSONException {
-			return requestJSONArraySync(url, requestHeaders, requestBody, DEFAULT_TIMEOUT);
+		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws IOException, JSONException {
+			return requestJSONArraySync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a JSON array in a sync way.
@@ -373,14 +389,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used
 		 * @param timeout Timeout in milliseconds */
-		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestBody, final int timeout) throws IOException, JSONException {
-			return new JSONArray(requestStringSync(url, requestHeaders, requestBody, timeout));
+		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws IOException, JSONException {
+			return new JSONArray(requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout));
 		}
 		
 	}
 	
 
-	/** 
+	/**
 	 * Concrete implementation for a web service which outputs a XML document
 	 * @see Request
 	 */
@@ -397,7 +413,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			
 			// Open connection and get string
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestMethod, requestBody, timeout);
 			
 			// On success, result is the XML document
 			final StringReader responseReader = new StringReader(rawResponse);
@@ -407,22 +423,22 @@ import javax.xml.parsers.DocumentBuilderFactory;
 			
 		}
 
-		@Override protected void postExecute(final String url, Object result) {
+		@Override protected void postExecute(final String url, final Object result) {
 			
 			// Cast JSON response
-			Document response = (Document)result;
+			final Document response = (Document)result;
 			
 			// Is error?
 			final Element responseElement = response.getDocumentElement();
 			if (responseElement.hasAttribute("error") && responseElement.getAttribute("error").equals("1")) {
-				for (IEventListener<Document> l : eventListeners) l.onError(url, 
+				for (final IEventListener<Document> l : eventListeners) l.onError(url,
 					responseElement.hasAttribute("error_code") ? responseElement.getAttribute("error_code") : "unknown_error",
 					responseElement.hasAttribute("error_message") ? responseElement.getAttribute("error_message") : "(unknown error)"
 				);
 				
 			// Success?
 			} else {
-				for (IEventListener<Document> l : eventListeners) l.onSuccess(url, response);
+				for (final IEventListener<Document> l : eventListeners) l.onSuccess(url, response);
 			}
 			
 		}
@@ -435,8 +451,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		 * This method is not used by class itself, it's intended to be an utility method
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used */
-		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestBody) throws Exception {
-			return requestXMLDocumentSync(url, requestHeaders, requestBody, DEFAULT_TIMEOUT);
+		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws Exception {
+			return requestXMLDocumentSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a XML document in a sync way.
@@ -444,8 +460,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		 * @param requestHeaders The request headers
 		 * @param requestBody The request body, if not null a POST request will be then used
 		 * @param timeout Timeout in milliseconds */
-		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestBody, int timeout) throws Exception {
-			final String response = requestStringSync(url, requestHeaders, requestBody, timeout);
+		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws Exception {
+			final String response = requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout);
 			final StringReader responseReader = new StringReader(response);
 			final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(responseReader));
 			responseReader.close();
@@ -471,17 +487,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 			// Open connection and get string
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestBody, timeout);
+			rawResponse = Request.requestStringSyncFromConnection(connection, requestHeaders, requestMethod, requestBody, timeout);
 
 			// On success, result is the response as String
 			return rawResponse;
 
 		}
 
-		@Override protected void postExecute(final String url, Object result) {
+		@Override protected void postExecute(final String url, final Object result) {
 
 			// Always success if here, there's nothing to check in the plain text response
-			for (IEventListener<String> l : eventListeners) l.onSuccess(url, (String)result);
+			for (final IEventListener<String> l : eventListeners) l.onSuccess(url, (String)result);
 
 		}
 
