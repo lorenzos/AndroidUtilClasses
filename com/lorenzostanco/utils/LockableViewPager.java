@@ -2,6 +2,7 @@ package com.lorenzostanco.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -13,27 +14,27 @@ import android.view.MotionEvent;
 	
 	private boolean isPagingEnabled = true;
 	
-	public LockableViewPager(Context context) {
+	public LockableViewPager(final Context context) {
 		super(context);
 	}
 	
-	public LockableViewPager(Context context, AttributeSet attrs) {
+	public LockableViewPager(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
 	
-	@SuppressLint("ClickableViewAccessibility") @Override public boolean onTouchEvent(MotionEvent event) {
+	@SuppressLint("ClickableViewAccessibility") @Override public boolean onTouchEvent(final MotionEvent event) {
 		return this.isPagingEnabled && super.onTouchEvent(event);
 	}
 	
-	@Override public boolean onInterceptTouchEvent(MotionEvent event) {
+	@Override public boolean onInterceptTouchEvent(final MotionEvent event) {
 		return this.isPagingEnabled && super.onInterceptTouchEvent(event);
 	}
 
-	@Override public boolean executeKeyEvent(final KeyEvent event) {
+	@Override public boolean executeKeyEvent(@NonNull final KeyEvent event) {
 		return false;
 	}
 	
-	public void setPagingEnabled(boolean b) {
+	public void setPagingEnabled(final boolean b) {
 		this.isPagingEnabled = b;
 	}
 	

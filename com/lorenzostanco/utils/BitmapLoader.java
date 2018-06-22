@@ -1,18 +1,18 @@
 package com.lorenzostanco.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Carica in memoria immagini da file e risorse nel modo più efficiente possibile.
  */
-@SuppressWarnings("unused") public class BitmapLoader {
+@SuppressWarnings("unused") public final class BitmapLoader {
 
 	public final static boolean LOG = true;
 	public final static String TAG = "BITMAP-LOADER";
@@ -20,14 +20,14 @@ import android.util.Log;
 	/** 
 	 * Carica un'immagine da file alla massima dimensione possibile (senza subsample).
 	 */
-	public static Bitmap load(String path) {
+	public static Bitmap load(final String path) {
 		return load(path, 0, 0);
 	}
 
 	/** 
 	 * Carica un'immagine dalle risorse alla massima dimensione possibile (senza subsample).
 	 */
-	public static Bitmap load(Resources res, int resId) {
+	public static Bitmap load(final Resources res, final int resId) {
 		return load(res, resId, 0, 0);
 	}
 
@@ -37,7 +37,7 @@ import android.util.Log;
 	 * @param destW Larghezza del contenitore dell'immagine, 0 se non si conosce
 	 * @param destH Altezza del contenitore dell'immagine, 0 se non si conosce
 	 */
-	public static Bitmap load(String path, int destW, int destH) {
+	public static Bitmap load(final String path, final int destW, final int destH) {
 		final int[] size = getSize(path);
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inScaled = false;
@@ -52,7 +52,7 @@ import android.util.Log;
 	 * @param destW Larghezza del contenitore dell'immagine, 0 se non si conosce
 	 * @param destH Altezza del contenitore dell'immagine, 0 se non si conosce
 	 */
-	public static Bitmap load(Resources res, int resId, int destW, int destH) {
+	public static Bitmap load(final Resources res, final int resId, final int destW, final int destH) {
 		final int[] size = getSize(res, resId);
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inScaled = false;
@@ -68,7 +68,7 @@ import android.util.Log;
 	 * @param destW Larghezza del contenitore dell'immagine, 0 se non si conosce
 	 * @param destH Altezza del contenitore dell'immagine, 0 se non si conosce
 	 */
-	public static Bitmap load(AssetManager assets, String path, int destW, int destH) {
+	public static Bitmap load(final AssetManager assets, final String path, final int destW, final int destH) {
 		final int[] size = getSize(assets, path);
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inScaled = false;
@@ -79,7 +79,7 @@ import android.util.Log;
 			final Bitmap ret = BitmapFactory.decodeStream(is, null, options);
 			is.close();
 			return ret;
-		} catch (IOException _) {
+		} catch (IOException x) {
 			return null;
 		}
 	}
@@ -87,7 +87,7 @@ import android.util.Log;
 	/**
 	 * Ritorna le dimensioni (larghezza e altezza) di un'immagine da file
 	 */
-	public static int[] getSize(String path) {
+	public static int[] getSize(final String path) {
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeFile(path, options);
@@ -97,7 +97,7 @@ import android.util.Log;
 	/**
 	 * Ritorna le dimensioni (larghezza e altezza) di un'immagine dalle risorse
 	 */
-	public static int[] getSize(Resources res, int resId) {
+	public static int[] getSize(final Resources res, final int resId) {
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeResource(res, resId, options);
@@ -107,7 +107,7 @@ import android.util.Log;
 	/**
 	 * Ritorna le dimensioni (larghezza e altezza) di un'immagine dagli assets
 	 */
-	public static int[] getSize(AssetManager assets, String path) {
+	public static int[] getSize(final AssetManager assets, final String path) {
 		try {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
@@ -115,7 +115,7 @@ import android.util.Log;
 			BitmapFactory.decodeStream(is, null, options);
 			is.close();
 			return new int[] { options.outWidth, options.outHeight };
-		} catch (IOException _) {
+		} catch (IOException x) {
 			return new int[] { 0, 0 };
 		}
 	}

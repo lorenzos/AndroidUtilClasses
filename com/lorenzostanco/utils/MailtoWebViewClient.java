@@ -13,10 +13,10 @@ import android.webkit.WebViewClient;
  */
 @SuppressWarnings("unused") public class MailtoWebViewClient extends WebViewClient {
 	
-	@Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+	@Override public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
 		if (url.startsWith("mailto:")) {
-			MailTo mt = MailTo.parse(url);
-			Intent i = newEmailIntent(view.getContext(), mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
+			final MailTo mt = MailTo.parse(url);
+			final Intent i = newEmailIntent(view.getContext(), mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
 			view.getContext().startActivity(i);
 		} else {
 			view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
@@ -24,8 +24,8 @@ import android.webkit.WebViewClient;
 		return true;
 	}
 	
-	public static Intent newEmailIntent(Context context, String address, String subject, String body, String cc) {
-		Intent intent = new Intent(Intent.ACTION_SEND);
+	public static Intent newEmailIntent(final Context context, final String address, final String subject, final String body, final String cc) {
+		final Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.putExtra(Intent.EXTRA_EMAIL, new String[] { address });
 		intent.putExtra(Intent.EXTRA_TEXT, body);
 		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
