@@ -195,7 +195,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 		if (this.asyncTask != null) this.asyncTask.cancel(true);
 		if (this.isRunning()) {
 			final String url = this.connection.getURL().toString();
-			disconnect();
+			new Thread(new Runnable() {
+				@Override public void run() {
+					disconnect();
+				}
+			}).start();
 			for (final IEventListener<T> l : this.eventListeners) l.onCancel(url);
 		}
 	}
