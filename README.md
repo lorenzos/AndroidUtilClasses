@@ -64,7 +64,7 @@ A generic, abstract, web service client that uses `HttpURLConnection` inside an 
 Inspired by the great [Mootools](http://mootools.net/) [`Request`](http://mootools.net/core/docs/1.5.1/Request/Request) class.
 
 
-### [`ToastQueue`](com/lorenzostanco/utils/Request.java)
+### [`ToastQueue`](com/lorenzostanco/utils/ToastQueue.java)
 
 Enqueue toasts in order to avoid Toast overlapping occurring in Android 8.1+. See <https://issuetracker.google.com/issues/79159357>.
 
