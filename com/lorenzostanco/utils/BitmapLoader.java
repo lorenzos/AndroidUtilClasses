@@ -142,11 +142,11 @@ import java.io.InputStream;
 			
 			// Choose the smallest ratio as inSampleSize value, this will guarantee a final 
 			// image with both dimensions larger than or equal to the requested height and width.
-			inSampleSize = ratioW < ratioH ? ratioW : ratioH;
+			inSampleSize = Math.min(ratioW, ratioH);
 			
 		}
 		
-		return inSampleSize < 1 ? 1 : inSampleSize;
+		return Math.max(inSampleSize, 1);
 		
 	}
 	
