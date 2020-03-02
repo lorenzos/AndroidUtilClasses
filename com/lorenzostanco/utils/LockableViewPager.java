@@ -8,6 +8,10 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
+// For AndroidX projects:
+// import androidx.annotation.NonNull;
+// import androidx.viewpager.widget.ViewPager;
+
 /** Un ViewPager orizzontale, la cui paginazione col tocco può essere all'occorrenza bloccata 
  * http://stackoverflow.com/a/7814054/995958 */
 @SuppressWarnings("unused") public class LockableViewPager extends ViewPager {
