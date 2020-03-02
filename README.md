@@ -1,7 +1,7 @@
 AndroidUtilClasses
 ==================
 
-A growing collection of tiny utility classes for Android development.
+A collection of tiny utility classes for Android development.
 
 
 Included classes
