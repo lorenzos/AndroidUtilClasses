@@ -9,7 +9,7 @@ import android.widget.Toast;
  * Enqueue toasts in order to avoid Toast overlapping occurring in Android 8.1+
  * https://issuetracker.google.com/issues/79159357
  */
-@SuppressWarnings("unused") public class ToastQueue {
+@SuppressWarnings("unused") public final class ToastQueue {
 
 	private static final int LONG_DELAY = 3500; 
 	private static final int SHORT_DELAY = 2000;
