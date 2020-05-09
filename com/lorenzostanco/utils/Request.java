@@ -44,7 +44,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * ws.send(url.build().toString());
  * </pre>
  */
-@SuppressWarnings("unused") public abstract class Request<T> {
+@SuppressWarnings({ "unused", "Convert2Lambda", "Anonymous2MethodRef", "CharsetObjectCanBeUsed" }) 
+public abstract class Request<T> {
 
 	public final static int READ_BUFFER_SIZE = 4 * 1024;
 	public final static int DEFAULT_TIMEOUT = 60000;
