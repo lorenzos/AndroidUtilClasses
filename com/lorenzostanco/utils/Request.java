@@ -44,7 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * ws.send(url.build().toString());
  * </pre>
  */
-@SuppressWarnings({ "unused", "Convert2Lambda", "Anonymous2MethodRef", "CharsetObjectCanBeUsed" }) 
+@SuppressWarnings({ "unused", "Convert2Lambda", "Anonymous2MethodRef", "CharsetObjectCanBeUsed", "RedundantSuppression" }) 
 public abstract class Request<T> {
 
 	public final static int READ_BUFFER_SIZE = 4 * 1024;
@@ -228,16 +228,16 @@ public abstract class Request<T> {
 	
 	/** Read an URL to get a String in a sync way.
 	 * This method is not used by class itself, it's intended to be an utility method
-	 * @param requestHeaders The request headers
-	 * @param requestBody The request body, if not null a POST request will be then used */
+	 * @param requestHeaders The request headers, can be NULL
+	 * @param requestBody The request body, can be NULL */
 	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final Object requestBody) throws IOException {
 		return requestStringSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 	}
 	
 	/** Read an URL to get a String in a sync way.
 	 * This method is not used by class itself, it's intended to be an utility method
-	 * @param requestHeaders The request headers
-	 * @param requestBody The request body, if not null a POST request will be then used
+	 * @param requestHeaders The request headers, can be NULL
+	 * @param requestBody The request body, can be NULL
 	 * @param timeout Timeout in milliseconds */
 	public static String requestStringSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final Object requestBody, final int timeout) throws IOException {
 		final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection(); // Open connection
@@ -366,16 +366,16 @@ public abstract class Request<T> {
 		
 		/** Read an URL to get a JSON object in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used */
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL */
 		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws IOException, JSONException {
 			return requestJSONObjectSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a JSON object in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL
 		 * @param timeout Timeout in milliseconds */
 		public static JSONObject requestJSONObjectSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws IOException, JSONException {
 			return new JSONObject(requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout));
@@ -383,16 +383,16 @@ public abstract class Request<T> {
 
 		/** Read an URL to get a JSON array in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used */
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL */
 		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws IOException, JSONException {
 			return requestJSONArraySync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a JSON array in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL
 		 * @param timeout Timeout in milliseconds */
 		public static JSONArray requestJSONArraySync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws IOException, JSONException {
 			return new JSONArray(requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout));
@@ -454,16 +454,16 @@ public abstract class Request<T> {
 
 		/** Read an URL to get a XML document in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used */
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL */
 		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody) throws Exception {
 			return requestXMLDocumentSync(url, requestHeaders, requestMethod, requestBody, DEFAULT_TIMEOUT);
 		}
 
 		/** Read an URL to get a XML document in a sync way.
 		 * This method is not used by class itself, it's intended to be an utility method
-		 * @param requestHeaders The request headers
-		 * @param requestBody The request body, if not null a POST request will be then used
+		 * @param requestHeaders The request headers, can be NULL
+		 * @param requestBody The request body, can be NULL
 		 * @param timeout Timeout in milliseconds */
 		public static Document requestXMLDocumentSync(final String url, final Map<String, String> requestHeaders, final String requestMethod, final String requestBody, final int timeout) throws Exception {
 			final String response = requestStringSync(url, requestHeaders, requestMethod, requestBody, timeout);
